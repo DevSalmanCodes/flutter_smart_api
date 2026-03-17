@@ -42,7 +42,7 @@ class ModelFactory {
 
     // Also register the list parser so `List<T>` resolves automatically.
     _listRegistry[_listTypeOf<T>()] = (jsonList) =>
-        jsonList.map((e) => factory(e as Map<String, dynamic>)).toList();
+        jsonList.map<T>((e) => factory(e as Map<String, dynamic>)).toList();
   }
 
   /// Removes [T] from both registries (useful in tests).

@@ -56,18 +56,25 @@ class Api {
     bool persistent = false,
     Duration? cacheTtl,
     Map<String, dynamic>? headers,
+    T Function(dynamic json)? parser,
   }) async {
     final key = ApiCache.buildKey(path, query);
 
     if (cache) {
-      final cachedData =
+      final rawCached =
           await CacheManager.instance.get(key, persistent: persistent);
-      if (cachedData != null) {
-        return cachedData as T;
+      if (rawCached != null) {
+        // rawCached is the original Dio response.data (List/Map of primitives).
+        // Re-parsing ensures we always return a correctly typed T regardless
+        // of whether the data came from memory or Hive (where jsonDecode gives
+        // back List<dynamic> / Map<String, dynamic>).
+        return JsonParser.parse<T>(rawCached, parserOverride: parser);
       }
     }
 
-    final response = await _request<T>(
+    // Fetch from network — store the RAW response.data (not the parsed model)
+    // so that Hive can JSON-encode it and re-parse it correctly on next access.
+    final rawResponse = await _rawRequest(
       method: 'GET',
       path: path,
       queryParameters: query,
@@ -77,13 +84,13 @@ class Api {
     if (cache) {
       await CacheManager.instance.set(
         key: key,
-        value: response,
+        value: rawResponse,          // raw JSON — safe for jsonEncode
         ttl: cacheTtl ?? ApiCache.instance.defaultTtl,
         persistent: persistent,
       );
     }
 
-    return response;
+    return JsonParser.parse<T>(rawResponse, parserOverride: parser);
   }
 
   /// Like [get], but returns a [Result] instead of throwing.
@@ -94,13 +101,15 @@ class Api {
     bool persistent = false,
     Duration? cacheTtl,
     Map<String, dynamic>? headers,
+    T Function(dynamic json)? parser,
   }) =>
       _safe(() => get<T>(path,
           query: query,
           cache: cache,
           persistent: persistent,
           cacheTtl: cacheTtl,
-          headers: headers));
+          headers: headers,
+          parser: parser));
 
   // ─── POST ─────────────────────────────────────────────────────────────────
 
@@ -112,6 +121,7 @@ class Api {
     dynamic body,
     Map<String, dynamic>? query,
     Map<String, dynamic>? headers,
+    T Function(dynamic json)? parser,
   }) =>
       _request<T>(
         method: 'POST',
@@ -119,6 +129,7 @@ class Api {
         data: body,
         queryParameters: query,
         headers: headers,
+        parser: parser,
       );
 
   /// Like [post], but returns a [Result] instead of throwing.
@@ -127,8 +138,9 @@ class Api {
     dynamic body,
     Map<String, dynamic>? query,
     Map<String, dynamic>? headers,
+    T Function(dynamic json)? parser,
   }) =>
-      _safe(() => post<T>(path, body: body, query: query, headers: headers));
+      _safe(() => post<T>(path, body: body, query: query, headers: headers, parser: parser));
 
   // ─── PUT ──────────────────────────────────────────────────────────────────
 
@@ -140,6 +152,7 @@ class Api {
     dynamic body,
     Map<String, dynamic>? query,
     Map<String, dynamic>? headers,
+    T Function(dynamic json)? parser,
   }) =>
       _request<T>(
         method: 'PUT',
@@ -147,6 +160,7 @@ class Api {
         data: body,
         queryParameters: query,
         headers: headers,
+        parser: parser,
       );
 
   /// Like [put], but returns a [Result] instead of throwing.
@@ -155,8 +169,9 @@ class Api {
     dynamic body,
     Map<String, dynamic>? query,
     Map<String, dynamic>? headers,
+    T Function(dynamic json)? parser,
   }) =>
-      _safe(() => put<T>(path, body: body, query: query, headers: headers));
+      _safe(() => put<T>(path, body: body, query: query, headers: headers, parser: parser));
 
   // ─── PATCH ────────────────────────────────────────────────────────────────
 
@@ -168,6 +183,7 @@ class Api {
     dynamic body,
     Map<String, dynamic>? query,
     Map<String, dynamic>? headers,
+    T Function(dynamic json)? parser,
   }) =>
       _request<T>(
         method: 'PATCH',
@@ -175,6 +191,7 @@ class Api {
         data: body,
         queryParameters: query,
         headers: headers,
+        parser: parser,
       );
 
   /// Like [patch], but returns a [Result] instead of throwing.
@@ -183,8 +200,9 @@ class Api {
     dynamic body,
     Map<String, dynamic>? query,
     Map<String, dynamic>? headers,
+    T Function(dynamic json)? parser,
   }) =>
-      _safe(() => patch<T>(path, body: body, query: query, headers: headers));
+      _safe(() => patch<T>(path, body: body, query: query, headers: headers, parser: parser));
 
   // ─── DELETE ───────────────────────────────────────────────────────────────
 
@@ -223,6 +241,7 @@ class Api {
     bool persistent = false,
     Duration? cacheTtl,
     Map<String, dynamic>? headers,
+    T Function(dynamic json)? parser,
   }) async {
     try {
       final data = await get<T>(path,
@@ -230,7 +249,8 @@ class Api {
           cache: cache,
           persistent: persistent,
           cacheTtl: cacheTtl,
-          headers: headers);
+          headers: headers,
+          parser: parser);
       return ApiResponse.success(data);
     } on ApiException catch (e) {
       return ApiResponse.failure(e);
@@ -239,8 +259,9 @@ class Api {
 
   // ─── Private helpers ──────────────────────────────────────────────────────
 
-  /// Core request executor.  All public methods funnel through here.
-  static Future<T> _request<T>({
+  /// Executes the HTTP request and returns the **raw** Dio response body
+  /// (unparsed List/Map of primitives) so it can be safely stored in cache.
+  static Future<dynamic> _rawRequest({
     required String method,
     required String path,
     dynamic data,
@@ -257,8 +278,7 @@ class Api {
           headers: headers,
         ),
       );
-
-      return JsonParser.parse<T>(response.data);
+      return response.data;
     } on DioException catch (e) {
       throw ApiException.fromDioError(e);
     } on ApiException {
@@ -266,6 +286,25 @@ class Api {
     } catch (e) {
       throw ApiException(message: 'Unexpected error: $e');
     }
+  }
+
+  /// Fetches raw JSON via [_rawRequest] then parses through [JsonParser].
+  static Future<T> _request<T>({
+    required String method,
+    required String path,
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Map<String, dynamic>? headers,
+    T Function(dynamic json)? parser,
+  }) async {
+    final raw = await _rawRequest(
+      method: method,
+      path: path,
+      data: data,
+      queryParameters: queryParameters,
+      headers: headers,
+    );
+    return JsonParser.parse<T>(raw, parserOverride: parser);
   }
 
   /// Wraps a throwing [call] in a try/catch and returns a [Result].

@@ -34,6 +34,7 @@ export 'src/parser/model_factory.dart';
 
 // Cache
 export 'src/cache/api_cache.dart';
+export 'src/cache/cache_manager.dart';
 
 // Utils
 export 'src/utils/result.dart';
