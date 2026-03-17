@@ -1,4 +1,5 @@
 import 'package:flutter_smart_api/src/network/dio_client.dart';
+import '../cache/hive_cache.dart';
 
 /// Global configuration for the [flutter_smart_api] package.
 ///
@@ -57,15 +58,18 @@ class ApiConfig {
 
   /// Initialises the package with the provided settings.
   ///
+  /// Optionally await `ApiConfig.init()` if using `CacheManager` with
+  /// disk-persistent caching to ensure the local database opens completely.
+  ///
   /// Must be called **before** the first API request.
   /// Calling [init] again will reset the Dio instance.
-  static void init({
+  static Future<void> init({
     required String baseUrl,
     Duration timeout = const Duration(seconds: 30),
     Map<String, dynamic>? defaultHeaders,
     int retryAttempts = 3,
     bool enableLogging = true,
-  }) {
+  }) async {
     assert(baseUrl.isNotEmpty, 'baseUrl must not be empty.');
     _baseUrl = baseUrl;
     _timeout = timeout;
@@ -79,6 +83,9 @@ class ApiConfig {
         ...defaultHeaders,
       };
     }
+
+    // Initialize the Hive Persistent caching DB
+    await HiveCache.instance.init();
 
     // Reset and rebuild the Dio instance with the new config.
     DioClient.instance.reset();

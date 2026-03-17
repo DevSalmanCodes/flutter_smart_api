@@ -2,6 +2,7 @@
 
 import 'package:dio/dio.dart';
 import '../cache/api_cache.dart';
+import '../cache/cache_manager.dart';
 import 'api_exception.dart';
 import 'api_response.dart';
 import '../network/dio_client.dart';
@@ -52,13 +53,17 @@ class Api {
     String path, {
     Map<String, dynamic>? query,
     bool cache = false,
+    bool persistent = false,
     Duration? cacheTtl,
     Map<String, dynamic>? headers,
   }) async {
+    final key = ApiCache.buildKey(path, query);
+
     if (cache) {
-      final key = ApiCache.buildKey(path, query);
-      if (ApiCache.instance.has(key)) {
-        return ApiCache.instance.get(key) as T;
+      final cachedData =
+          await CacheManager.instance.get(key, persistent: persistent);
+      if (cachedData != null) {
+        return cachedData as T;
       }
     }
 
@@ -70,8 +75,12 @@ class Api {
     );
 
     if (cache) {
-      final key = ApiCache.buildKey(path, query);
-      ApiCache.instance.set(key, response, ttl: cacheTtl);
+      await CacheManager.instance.set(
+        key: key,
+        value: response,
+        ttl: cacheTtl ?? ApiCache.instance.defaultTtl,
+        persistent: persistent,
+      );
     }
 
     return response;
@@ -82,11 +91,16 @@ class Api {
     String path, {
     Map<String, dynamic>? query,
     bool cache = false,
+    bool persistent = false,
     Duration? cacheTtl,
     Map<String, dynamic>? headers,
   }) =>
       _safe(() => get<T>(path,
-          query: query, cache: cache, cacheTtl: cacheTtl, headers: headers));
+          query: query,
+          cache: cache,
+          persistent: persistent,
+          cacheTtl: cacheTtl,
+          headers: headers));
 
   // ─── POST ─────────────────────────────────────────────────────────────────
 
@@ -206,12 +220,17 @@ class Api {
     String path, {
     Map<String, dynamic>? query,
     bool cache = false,
+    bool persistent = false,
     Duration? cacheTtl,
     Map<String, dynamic>? headers,
   }) async {
     try {
       final data = await get<T>(path,
-          query: query, cache: cache, cacheTtl: cacheTtl, headers: headers);
+          query: query,
+          cache: cache,
+          persistent: persistent,
+          cacheTtl: cacheTtl,
+          headers: headers);
       return ApiResponse.success(data);
     } on ApiException catch (e) {
       return ApiResponse.failure(e);
