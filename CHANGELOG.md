@@ -4,6 +4,11 @@ All notable changes to `flutter_smart_api` will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-03-17
+
+### Changed
+- Updated official GitHub repository links in `pubspec.yaml` to point to the correct publisher location.
+
 ## [1.0.0] - 2026-03-17
 
 ### Added
