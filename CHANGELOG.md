@@ -4,6 +4,17 @@ All notable changes to `flutter_smart_api` will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-03-17
+
+### Fixed
+- Fixed runtime type cast error `List<dynamic> is not a subtype of List<T>` when parsing generic lists.
+- Fixed Hive caching to correctly serialize and deserialize model data by storing raw JSON maps.
+- Added `CacheManager` to package exports.
+
+### Added
+- Added `parser` callback parameter to all API methods (`get`, `post`, etc.) to allow manual JsonParser overrides.
+- Added comprehensive premium example app in `example/lib/showcase_screen.dart` demonstrating all package features.
+
 ## [1.0.1] - 2026-03-17
 
 ### Changed
