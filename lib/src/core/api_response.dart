@@ -43,7 +43,6 @@ class ApiResponse<T> {
   }
 
   @override
-  String toString() => isSuccess
-      ? 'ApiResponse.success($data)'
-      : 'ApiResponse.failure($error)';
+  String toString() =>
+      isSuccess ? 'ApiResponse.success($data)' : 'ApiResponse.failure($error)';
 }

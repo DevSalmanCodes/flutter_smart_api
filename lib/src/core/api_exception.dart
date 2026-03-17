@@ -66,7 +66,8 @@ class ApiException implements Exception {
     final message = _extractMessage(data);
 
     if (statusCode == 401) {
-      return UnauthorizedException(message: message ?? 'Unauthorised.', data: data);
+      return UnauthorizedException(
+          message: message ?? 'Unauthorised.', data: data);
     }
     if (statusCode == 403) {
       return UnauthorizedException(
@@ -74,15 +75,21 @@ class ApiException implements Exception {
     }
     if (statusCode >= 500) {
       return ServerException(
-          message: message ?? 'Server error ($statusCode).', statusCode: statusCode, data: data);
+          message: message ?? 'Server error ($statusCode).',
+          statusCode: statusCode,
+          data: data);
     }
     if (statusCode == 404) {
       return ApiException(
-          message: message ?? 'Resource not found.', statusCode: statusCode, data: data);
+          message: message ?? 'Resource not found.',
+          statusCode: statusCode,
+          data: data);
     }
     if (statusCode == 422) {
       return ApiException(
-          message: message ?? 'Validation error.', statusCode: statusCode, data: data);
+          message: message ?? 'Validation error.',
+          statusCode: statusCode,
+          data: data);
     }
 
     return ApiException(
@@ -100,15 +107,15 @@ class ApiException implements Exception {
   }
 
   @override
-  String toString() =>
-      'ApiException(status: $statusCode, message: "$message")';
+  String toString() => 'ApiException(status: $statusCode, message: "$message")';
 }
 
 // ─── Specific Exceptions ───────────────────────────────────────────────────
 
 /// Thrown when the device cannot reach the server (no internet / timeout).
 class NetworkException extends ApiException {
-  const NetworkException({required super.message, super.statusCode, super.data});
+  const NetworkException(
+      {required super.message, super.statusCode, super.data});
 
   @override
   String toString() => 'NetworkException: $message';

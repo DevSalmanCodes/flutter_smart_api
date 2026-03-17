@@ -111,7 +111,8 @@ void main() {
     });
 
     test('expired entries return null', () {
-      ApiCache.instance.set('/data', 'value', ttl: const Duration(milliseconds: 1));
+      ApiCache.instance
+          .set('/data', 'value', ttl: const Duration(milliseconds: 1));
       // Sleep a bit longer than the TTL.  This relies on real time—fine for a
       // unit test but keep TTL short.
       Future.delayed(const Duration(milliseconds: 5), () {
@@ -173,8 +174,7 @@ void main() {
 
     test('parses registered model from Map', () {
       ModelFactory.register<_FakeUser>((j) => _FakeUser.fromJson(j));
-      final user =
-          JsonParser.parse<_FakeUser>({'id': 7, 'name': 'Charlie'});
+      final user = JsonParser.parse<_FakeUser>({'id': 7, 'name': 'Charlie'});
       expect(user.name, 'Charlie');
     });
 

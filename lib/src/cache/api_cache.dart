@@ -1,4 +1,3 @@
-
 /// A simple in-memory cache with optional TTL (time-to-live) per entry.
 ///
 /// Used by [Api.get] when `cache: true` is passed.

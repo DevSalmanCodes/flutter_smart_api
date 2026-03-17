@@ -54,7 +54,8 @@ class JsonParser {
     if (listParser != null) {
       if (json is! List) {
         throw ParsingException(
-          message: 'Expected a JSON array for type $T but got ${json.runtimeType}.',
+          message:
+              'Expected a JSON array for type $T but got ${json.runtimeType}.',
           data: json,
         );
       }
@@ -65,7 +66,8 @@ class JsonParser {
     if (ModelFactory.isRegistered<T>()) {
       if (json is! Map<String, dynamic>) {
         throw ParsingException(
-          message: 'Expected a JSON object for type $T but got ${json.runtimeType}.',
+          message:
+              'Expected a JSON object for type $T but got ${json.runtimeType}.',
           data: json,
         );
       }

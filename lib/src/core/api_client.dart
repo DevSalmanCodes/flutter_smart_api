@@ -85,7 +85,8 @@ class Api {
     Duration? cacheTtl,
     Map<String, dynamic>? headers,
   }) =>
-      _safe(() => get<T>(path, query: query, cache: cache, cacheTtl: cacheTtl, headers: headers));
+      _safe(() => get<T>(path,
+          query: query, cache: cache, cacheTtl: cacheTtl, headers: headers));
 
   // ─── POST ─────────────────────────────────────────────────────────────────
 
@@ -209,7 +210,8 @@ class Api {
     Map<String, dynamic>? headers,
   }) async {
     try {
-      final data = await get<T>(path, query: query, cache: cache, cacheTtl: cacheTtl, headers: headers);
+      final data = await get<T>(path,
+          query: query, cache: cache, cacheTtl: cacheTtl, headers: headers);
       return ApiResponse.success(data);
     } on ApiException catch (e) {
       return ApiResponse.failure(e);
