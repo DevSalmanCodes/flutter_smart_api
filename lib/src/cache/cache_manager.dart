@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'api_cache.dart';
-import 'hive_cache.dart';
+import 'package:flutter_smart_api/src/cache/api_cache.dart';
+import 'package:flutter_smart_api/src/cache/hive_cache.dart';
 
 /// Orchestrates caching strategies prioritizing Memory -> Disk caching.
 ///

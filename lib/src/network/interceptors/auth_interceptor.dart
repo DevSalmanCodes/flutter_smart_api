@@ -14,7 +14,9 @@ class AuthInterceptor extends Interceptor {
   ) {
     final token = ApiConfig.token;
     if (token != null && token.isNotEmpty) {
-      options.headers['Authorization'] = 'Bearer $token';
+      if (!options.headers.containsKey('Authorization')) {
+        options.headers['Authorization'] = 'Bearer $token';
+      }
     }
     super.onRequest(options, handler);
   }

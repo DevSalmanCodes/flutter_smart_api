@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print
+import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_smart_api/flutter_smart_api.dart';
 
@@ -17,12 +18,15 @@ class TestUser {
 }
 
 void main() {
-  setUpAll(() {
-    ApiConfig.init(
+  setUpAll(() async {
+    final directory = Directory.systemTemp.createTempSync('online_tests');
+
+    await ApiConfig.init(
       baseUrl: 'https://jsonplaceholder.typicode.com',
       enableLogging: true,
       // Test shorter timeout
       timeout: const Duration(seconds: 10),
+      testCacheDirectory: directory.path,
     );
     ModelFactory.register<TestUser>((json) => TestUser.fromJson(json));
   });

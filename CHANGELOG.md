@@ -4,6 +4,16 @@ All notable changes to `flutter_smart_api` will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-03-22
+
+### Fixed
+- Fixed bug where `AuthInterceptor` aggressively overwrote manually provided authorization headers.
+- Fixed bug where `ApiConfig.addHeader` did not apply to the currently active network client dynamically.
+- Fixed `MissingPluginException` during headless unit tests by allowing `testCacheDirectory` in `ApiConfig.init`.
+
+### Added
+- Expanded unit testing suite (now 55+ tests) verifying cache resilience, parser failure safety, and accurate exception mapping.
+
 ## [1.0.2] - 2026-03-17
 
 ### Fixed

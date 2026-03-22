@@ -1,5 +1,5 @@
 import 'package:flutter_smart_api/src/network/dio_client.dart';
-import '../cache/hive_cache.dart';
+import 'package:flutter_smart_api/src/cache/hive_cache.dart';
 
 /// Global configuration for the [flutter_smart_api] package.
 ///
@@ -69,6 +69,7 @@ class ApiConfig {
     Map<String, dynamic>? defaultHeaders,
     int retryAttempts = 3,
     bool enableLogging = true,
+    String? testCacheDirectory,
   }) async {
     assert(baseUrl.isNotEmpty, 'baseUrl must not be empty.');
     _baseUrl = baseUrl;
@@ -85,7 +86,7 @@ class ApiConfig {
     }
 
     // Initialize the Hive Persistent caching DB
-    await HiveCache.instance.init();
+    await HiveCache.instance.init(testDirectory: testCacheDirectory);
 
     // Reset and rebuild the Dio instance with the new config.
     DioClient.instance.reset();
@@ -113,10 +114,12 @@ class ApiConfig {
   /// Adds or replaces a single header in [defaultHeaders].
   static void addHeader(String key, String value) {
     _defaultHeaders[key] = value;
+    DioClient.instance.dio.options.headers[key] = value;
   }
 
   /// Removes a header by [key].
   static void removeHeader(String key) {
     _defaultHeaders.remove(key);
+    DioClient.instance.dio.options.headers.remove(key);
   }
 }

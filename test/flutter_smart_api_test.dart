@@ -188,6 +188,40 @@ void main() {
       expect(users.length, 2);
       expect(users[0].name, 'Alice');
     });
+
+    test('throws ParsingException on malformed primitive', () {
+      expect(
+        () => JsonParser.parse<int>('not_an_int'),
+        throwsA(isA<ParsingException>()),
+      );
+    });
+
+    test('throws ParsingException when JSON is null but type is non-nullable', () {
+      ModelFactory.register<_FakeUser>((j) => _FakeUser.fromJson(j));
+      expect(
+        () => JsonParser.parse<_FakeUser>(null),
+        throwsA(isA<ParsingException>()),
+      );
+    });
+
+    test('throws ParsingException parsing deeply nested list without custom parserOverride', () {
+      ModelFactory.register<_FakeUser>((j) => _FakeUser.fromJson(j));
+      // Try parsing List<List<_FakeUser>> which is NOT registered automatically
+      expect(
+        () => JsonParser.parse<List<List<_FakeUser>>>([
+          [{'id': 1, 'name': 'A'}]
+        ]),
+        throwsA(isA<ParsingException>()),
+      );
+    });
+
+    test('parserOverride completely bypasses default logic', () {
+      final overrideResult = JsonParser.parse<int>(
+        '50',
+        parserOverride: (json) => 999,
+      );
+      expect(overrideResult, 999);
+    });
   });
 
   // ─── ApiConfig tests ──────────────────────────────────────────────────────

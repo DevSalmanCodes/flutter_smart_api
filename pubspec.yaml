@@ -3,7 +3,7 @@ description: >
   A production-ready Flutter API layer that eliminates repetitive boilerplate code.
   Provides automatic Dio setup, token injection, error handling, JSON parsing, 
   logging, retry logic, and optional in-memory caching.
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/DevSalmanCodes/flutter_smart_api
 repository: https://github.com/DevSalmanCodes/flutter_smart_api
 issue_tracker: https://github.com/DevSalmanCodes/flutter_smart_api/issues

@@ -93,5 +93,37 @@ void main() {
       // Value should be eradicated from disk upon reading an expired token
       expect(await HiveCache.instance.has('/expired'), isFalse);
     });
+    test('5. Handles corrupted cached JSON data gracefully', () async {
+      // Manually inject bad json into the hive box
+      final box = Hive.box('api_cache');
+      final expiryMs = DateTime.now().add(const Duration(minutes: 5)).millisecondsSinceEpoch;
+      await box.put('/corrupted', {
+        'data': '{"id": 1, "name": "bad json missing closing brace', // Invalid JSON
+        'expiry': expiryMs,
+      });
+
+      // Reading should not crash, it should just return null as if it missed cache
+      final value = await HiveCache.instance.get('/corrupted');
+      expect(value, isNull);
+      
+      // And it should have purged the corrupted key
+      expect(box.containsKey('/corrupted'), isFalse);
+    });
+
+    test('6. Caches massive payloads without issue', () async {
+      final largeList = List.generate(10000, (i) => {'id': i, 'name': 'Item $i'});
+      
+      await CacheManager.instance.set(
+        key: '/massive',
+        value: largeList,
+        ttl: const Duration(minutes: 5),
+        persistent: true,
+      );
+
+      final val = await CacheManager.instance.get('/massive', persistent: true);
+      expect(val, isNotNull);
+      expect((val as List).length, 10000);
+      expect(val[9999]['name'], 'Item 9999');
+    });
   });
 }
