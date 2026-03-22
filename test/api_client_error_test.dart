@@ -100,7 +100,7 @@ void main() {
 
     test('5. 4XX and 5XX Dio badResponse map correctly', () async {
       final reqOptions = RequestOptions(path: '/test');
-      
+
       // Test 401
       DioClient.instance.dio.interceptors.add(
         MockErrorInterceptor(

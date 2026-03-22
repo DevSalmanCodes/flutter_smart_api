@@ -10,7 +10,7 @@ class CacheManager {
   CacheManager._();
 
   static final CacheManager _instance = CacheManager._();
-  
+
   /// The global [CacheManager] orchestrator instance.
   static CacheManager get instance => _instance;
 

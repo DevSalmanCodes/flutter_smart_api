@@ -84,7 +84,7 @@ class Api {
     if (cache) {
       await CacheManager.instance.set(
         key: key,
-        value: rawResponse,          // raw JSON — safe for jsonEncode
+        value: rawResponse, // raw JSON — safe for jsonEncode
         ttl: cacheTtl ?? ApiCache.instance.defaultTtl,
         persistent: persistent,
       );
@@ -140,7 +140,8 @@ class Api {
     Map<String, dynamic>? headers,
     T Function(dynamic json)? parser,
   }) =>
-      _safe(() => post<T>(path, body: body, query: query, headers: headers, parser: parser));
+      _safe(() => post<T>(path,
+          body: body, query: query, headers: headers, parser: parser));
 
   // ─── PUT ──────────────────────────────────────────────────────────────────
 
@@ -171,7 +172,8 @@ class Api {
     Map<String, dynamic>? headers,
     T Function(dynamic json)? parser,
   }) =>
-      _safe(() => put<T>(path, body: body, query: query, headers: headers, parser: parser));
+      _safe(() => put<T>(path,
+          body: body, query: query, headers: headers, parser: parser));
 
   // ─── PATCH ────────────────────────────────────────────────────────────────
 
@@ -202,7 +204,8 @@ class Api {
     Map<String, dynamic>? headers,
     T Function(dynamic json)? parser,
   }) =>
-      _safe(() => patch<T>(path, body: body, query: query, headers: headers, parser: parser));
+      _safe(() => patch<T>(path,
+          body: body, query: query, headers: headers, parser: parser));
 
   // ─── DELETE ───────────────────────────────────────────────────────────────
 

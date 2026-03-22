@@ -65,11 +65,12 @@ void main() {
       expect(ApiCache.instance.has('/hydration'), isFalse);
 
       // Step C: Fetch via Cache Manager with persistent querying
-      final result = await CacheManager.instance.get('/hydration', persistent: true);
-      
+      final result =
+          await CacheManager.instance.get('/hydration', persistent: true);
+
       expect(result, isNotNull);
       expect(result['hydrated'], isTrue);
-      
+
       // Verification: The fetch from Disk should have hydrated it back into RAM
       expect(ApiCache.instance.has('/hydration'), isTrue);
     });
@@ -87,7 +88,8 @@ void main() {
       // Wait out the TTL
       await Future.delayed(const Duration(milliseconds: 100));
 
-      final value = await CacheManager.instance.get('/expired', persistent: true);
+      final value =
+          await CacheManager.instance.get('/expired', persistent: true);
       expect(value, isNull);
 
       // Value should be eradicated from disk upon reading an expired token
@@ -96,23 +98,26 @@ void main() {
     test('5. Handles corrupted cached JSON data gracefully', () async {
       // Manually inject bad json into the hive box
       final box = Hive.box('api_cache');
-      final expiryMs = DateTime.now().add(const Duration(minutes: 5)).millisecondsSinceEpoch;
+      final expiryMs =
+          DateTime.now().add(const Duration(minutes: 5)).millisecondsSinceEpoch;
       await box.put('/corrupted', {
-        'data': '{"id": 1, "name": "bad json missing closing brace', // Invalid JSON
+        'data':
+            '{"id": 1, "name": "bad json missing closing brace', // Invalid JSON
         'expiry': expiryMs,
       });
 
       // Reading should not crash, it should just return null as if it missed cache
       final value = await HiveCache.instance.get('/corrupted');
       expect(value, isNull);
-      
+
       // And it should have purged the corrupted key
       expect(box.containsKey('/corrupted'), isFalse);
     });
 
     test('6. Caches massive payloads without issue', () async {
-      final largeList = List.generate(10000, (i) => {'id': i, 'name': 'Item $i'});
-      
+      final largeList =
+          List.generate(10000, (i) => {'id': i, 'name': 'Item $i'});
+
       await CacheManager.instance.set(
         key: '/massive',
         value: largeList,

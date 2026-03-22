@@ -81,8 +81,10 @@ class _HomeScreenState extends State<HomeScreen> {
               },
               failure: (error) {
                 return Center(
-                  child: Text('Error: ${error.message}',
-                      style: const TextStyle(color: Colors.red)),
+                  child: Text(
+                    'Error: ${error.message}',
+                    style: const TextStyle(color: Colors.red),
+                  ),
                 );
               },
             );
@@ -119,10 +121,6 @@ class Post {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'body': body,
-    };
+    return {'id': id, 'title': title, 'body': body};
   }
 }

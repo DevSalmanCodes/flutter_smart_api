@@ -9,7 +9,7 @@ import 'package:flutter_smart_api/src/parser/model_factory.dart';
 /// - Any model registered with [ModelFactory]
 /// - `List<T>` where `T` is any registered model
 ///
-/// ## How List<T> parsing works
+/// ## How `List<T>` parsing works
 ///
 /// Dart erases generic type parameters at runtime, so `List<Post>` looks
 /// identical to `List<dynamic>` to the VM.  To work around this, [ModelFactory]

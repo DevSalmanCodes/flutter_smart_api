@@ -196,7 +196,8 @@ void main() {
       );
     });
 
-    test('throws ParsingException when JSON is null but type is non-nullable', () {
+    test('throws ParsingException when JSON is null but type is non-nullable',
+        () {
       ModelFactory.register<_FakeUser>((j) => _FakeUser.fromJson(j));
       expect(
         () => JsonParser.parse<_FakeUser>(null),
@@ -204,12 +205,16 @@ void main() {
       );
     });
 
-    test('throws ParsingException parsing deeply nested list without custom parserOverride', () {
+    test(
+        'throws ParsingException parsing deeply nested list without custom parserOverride',
+        () {
       ModelFactory.register<_FakeUser>((j) => _FakeUser.fromJson(j));
       // Try parsing List<List<_FakeUser>> which is NOT registered automatically
       expect(
         () => JsonParser.parse<List<List<_FakeUser>>>([
-          [{'id': 1, 'name': 'A'}]
+          [
+            {'id': 1, 'name': 'A'}
+          ]
         ]),
         throwsA(isA<ParsingException>()),
       );

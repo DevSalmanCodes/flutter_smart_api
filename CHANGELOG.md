@@ -4,6 +4,11 @@ All notable changes to `flutter_smart_api` will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-03-22
+
+### Fixed
+- Fixed pub.dev scoring issues (description length and dartdoc formatting warnings).
+
 ## [1.0.3] - 2026-03-22
 
 ### Fixed

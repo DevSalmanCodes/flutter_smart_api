@@ -40,41 +40,42 @@ void main() {
 
   group('AuthInterceptor Tests', () {
     test('1. Does not add Authorization header if token is null', () async {
-      final res = await Api.getSafe<dynamic>('/test');
-      if (res.isFailure) print(res.errorOrNull);
-      
+      await Api.getSafe<dynamic>('/test');
+
       final headers = captureInterceptor.lastRequestOptions!.headers;
       expect(headers.containsKey('Authorization'), isFalse);
     });
 
     test('2. Adds Authorization Bearer header if token is set', () async {
       ApiConfig.setToken('my-secret-token');
-      final res = await Api.getSafe<dynamic>('/test');
-      if (res.isFailure) print(res.errorOrNull);
-      
+      await Api.getSafe<dynamic>('/test');
+
       final headers = captureInterceptor.lastRequestOptions!.headers;
       expect(headers['Authorization'], 'Bearer my-secret-token');
     });
 
     test('3. Clears Authorization header when token is cleared', () async {
       ApiConfig.setToken('my-secret-token');
-      final res1 = await Api.getSafe<dynamic>('/test');
-      if (res1.isFailure) print(res1.errorOrNull);
-      expect(captureInterceptor.lastRequestOptions!.headers['Authorization'], 'Bearer my-secret-token');
+      await Api.getSafe<dynamic>('/test');
+      expect(captureInterceptor.lastRequestOptions!.headers['Authorization'],
+          'Bearer my-secret-token');
 
       ApiConfig.clearToken();
-      final res2 = await Api.getSafe<dynamic>('/test2');
-      if (res2.isFailure) print(res2.errorOrNull);
-      expect(captureInterceptor.lastRequestOptions!.headers.containsKey('Authorization'), isFalse);
+      await Api.getSafe<dynamic>('/test2');
+      expect(
+          captureInterceptor.lastRequestOptions!.headers
+              .containsKey('Authorization'),
+          isFalse);
     });
 
-    test('4. Does not override manually provided Authorization header', () async {
+    test('4. Does not override manually provided Authorization header',
+        () async {
       ApiConfig.setToken('my-global-token');
-      
+
       // Override in the specific request
-      final res = await Api.getSafe<dynamic>('/test', headers: {'Authorization': 'Bearer other-token'});
-      if (res.isFailure) print(res.errorOrNull);
-      
+      await Api.getSafe<dynamic>('/test',
+          headers: {'Authorization': 'Bearer other-token'});
+
       final headers = captureInterceptor.lastRequestOptions!.headers;
       expect(headers['Authorization'], 'Bearer other-token');
     });
@@ -83,17 +84,18 @@ void main() {
   group('ApiConfig defaultHeaders tests', () {
     test('1. defaultHeaders are applied to every request', () async {
       ApiConfig.addHeader('X-Custom-Client', 'SmartApp');
-      
-      final res1 = await Api.postSafe<dynamic>('/test', body: {});
-      if (res1.isFailure) print(res1.errorOrNull);
-      
+
+      await Api.postSafe<dynamic>('/test', body: {});
+
       final headers = captureInterceptor.lastRequestOptions!.headers;
       expect(headers['X-Custom-Client'], 'SmartApp');
-      
+
       ApiConfig.removeHeader('X-Custom-Client');
-      final res2 = await Api.postSafe<dynamic>('/test2', body: {});
-      if (res2.isFailure) print(res2.errorOrNull);
-      expect(captureInterceptor.lastRequestOptions!.headers.containsKey('X-Custom-Client'), isFalse);
+      await Api.postSafe<dynamic>('/test2', body: {});
+      expect(
+          captureInterceptor.lastRequestOptions!.headers
+              .containsKey('X-Custom-Client'),
+          isFalse);
     });
   });
 }

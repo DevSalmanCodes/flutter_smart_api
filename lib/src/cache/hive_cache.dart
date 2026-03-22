@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 /// A persistent disk cache implementation utilizing Hive.
-/// 
+///
 /// Data is stored serialized as a Map containing the raw JSON
 /// payload alongside an expiry timestamp.
 class HiveCache {
@@ -23,7 +23,7 @@ class HiveCache {
   /// Provide [testDirectory] strictly when running under headless unit test suites.
   Future<void> init({String? testDirectory}) async {
     if (_box != null && _box!.isOpen) return;
-    
+
     if (testDirectory != null) {
       Hive.init(testDirectory);
     } else {
